@@ -6,6 +6,7 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import json
+import os
 import subprocess
 import sys
 import time
@@ -19,11 +20,23 @@ PAIRS = ("p2p", "p2e", "e2p", "e2e")
 COMPOSE_FILE = "lab/podman-compose.yml"
 RESULTS_DIR = Path("results")
 
+# Receiver hostname each pairing's sender should relay to. Consumed by
+# the postfix/exim entrypoints via TARGET_RECEIVER.
+_TARGET_BY_PAIR = {
+    "p2p": "postfix-receiver",
+    "p2e": "exim-receiver",
+    "e2p": "postfix-receiver",
+    "e2e": "exim-receiver",
+}
+
 
 def _compose(cmd: list[str], profile: str) -> None:
+    env = os.environ.copy()
+    env["TARGET_RECEIVER"] = _TARGET_BY_PAIR[profile]
     subprocess.run(
         ["podman-compose", "-f", COMPOSE_FILE, "--profile", profile, *cmd],
         check=True,
+        env=env,
     )
 
 
@@ -63,7 +76,7 @@ def _dump_sender_log(case_id: str, pair: str) -> dict:
         log_path = case_log_dir / "mainlog"
         with open(log_path, "w") as f:
             subprocess.run(
-                ["podman", "exec", sender_container, "cat", "/var/spool/exim4/log/mainlog"],
+                ["podman", "exec", sender_container, "cat", "/var/log/exim4/mainlog"],
                 stdout=f, check=False,
             )
 

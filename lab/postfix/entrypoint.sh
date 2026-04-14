@@ -4,9 +4,10 @@ set -euo pipefail
 ROLE="${POSTFIX_ROLE:-receiver}"
 
 if [ "$ROLE" = "sender" ]; then
+    TARGET="${TARGET_RECEIVER:-postfix-receiver}"
     postconf -e 'myhostname = sender.labnet.test'
     postconf -e 'mydestination = sender.labnet.test, localhost'
-    postconf -e 'relayhost = [postfix-receiver]:25'
+    postconf -e "relayhost = [${TARGET}]:25"
     postconf -e 'smtp_host_lookup = native'
     postconf -e 'disable_dns_lookups = yes'
 elif [ "$ROLE" = "receiver" ]; then

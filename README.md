@@ -13,16 +13,19 @@ detection rule that flags the attack.
 
 ## Status
 
-**M0 (Floor) — COMPLETE.** See `docs/status.md`.
+**M1 (Paper match) — COMPLETE.** See `docs/status.md`.
 
-- Lab: `postfix-sender` → `postfix-receiver` → `dovecot` (LMTP → Maildir)
-  on isolated `labnet` Podman bridge, plus a `tcpdump` sidecar.
-- Harness: raw-socket SMTP client (never `smtplib`).
-- Oracle: RFC-strict stub SMTP server that replays captured pcaps.
-- Detection: containerized Zeek script with two detectors
-  (byte-pattern + transaction-rate).
-- Result: paper's A1 (`\n.\n`) and A5 (`\r\n.\n`) both classify as
-  **vulnerable** against Postfix 3.7 with `smtpd_forbid_bare_newline=no`.
+- Lab: 4 pairing profiles (`p2p`, `p2e`, `e2p`, `e2e`) over Postfix 3.7
+  and Exim 4.96, each with a sender-side and receiver-side tcpdump sidecar.
+- Harness: raw-socket SMTP client (never `smtplib`), 13-payload corpus.
+- Oracle: RFC-strict stub SMTP server, replayed against both pcap positions.
+- Detection (inline): containerized Zeek script with byte-pattern +
+  transaction-rate rules. **14 / 14 vulnerable cells caught (100 % recall).**
+- Detection (offline): Postfix mail.log / Exim mainlog parser.
+- Result: 14 / 52 cells vulnerable, all in the two Postfix-sender columns.
+  Exim sender is structurally immune because its outbound transport uses
+  `BDAT`/`CHUNKING` instead of dot-terminated `DATA`. See
+  `results/matrix.md` for the full pairing × payload table.
 
 ## Requirements
 
@@ -43,20 +46,22 @@ python3 -m venv .venv
 . .venv/bin/activate
 pip install -e '.[dev]'
 
-# Build lab images (one-time, ~2 minutes)
+# Build lab images (one-time, ~3 minutes)
 podman build --security-opt seccomp=unconfined -t smtp-lab-postfix:m0 lab/postfix/
+podman build --security-opt seccomp=unconfined -t smtp-lab-exim:m1     lab/exim/
 podman build --security-opt seccomp=unconfined -t smtp-lab-dovecot:m0 lab/dovecot/
 podman build --security-opt seccomp=unconfined -t smtp-lab-tcpdump:m0 lab/tcpdump-sidecar/
 podman pull docker.io/zeek/zeek:lts
 
-# Bring lab up
-podman-compose -f lab/podman-compose.yml up -d
-
-# Run M0 validation (connectivity smoke + A1/A5 cases + Zeek detection)
+# M0: floor validation (connectivity smoke + A1/A5 cases + Zeek detection).
+podman-compose -f lab/podman-compose.yml --profile p2p up -d
 python -m harness.run_m0
+podman-compose -f lab/podman-compose.yml --profile p2p down
 
-# Teardown
-podman-compose -f lab/podman-compose.yml down
+# M1: full 13-payload × 4-pairing matrix + Zeek coverage report.
+python -m harness.run_matrix              # writes results/matrix.json
+python -m harness.render_matrix           # writes results/matrix.md
+python -m harness.verify_zeek_coverage    # writes results/zeek-coverage.json
 ```
 
 Or run the whole pipeline end-to-end:
@@ -72,13 +77,12 @@ Or run the whole pipeline end-to-end:
 pytest tests/ -v
 ```
 
-21 tests cover:
-- Payload byte-preservation (base64 round-trips, line-ending integrity).
-- Carrier template byte accuracy (CRLF discipline, NUL preservation).
-- Stub SMTP receiver (RFC-strict DATA termination).
-- Harness raw-socket SMTP client.
-- Oracle pcap → stub replay pipeline.
-- Zeek detection smoke (notice raised on vulnerable pcaps, silent on baseline).
+Test suites:
+- `tests/test_payloads.py` — all 13 paper payloads round-trip byte-for-byte
+- `tests/test_carrier.py` / harness internals — CRLF discipline, NUL preservation
+- `tests/test_log_parser.py` — Postfix mail.log + Exim mainlog parsers
+- `tests/test_matrix.py` — golden regression on the 52-cell matrix
+- M0 byte-preservation, stub, send, oracle and Zeek smoke tests
 
 ## Directory layout
 
@@ -101,26 +105,42 @@ exposed on external interfaces. No payload ever reaches a real mail
 server. See `docs/specs/2026-04-14-smtp-smuggling-lab-design.md` §10
 for the full containment rules.
 
-## Research findings so far
+## Research findings (M1)
 
-Running M0 reproduces the paper's finding against Postfix 3.7
-(Debian 12) with `smtpd_forbid_bare_newline = no`:
+13 payloads × 4 MTA pairings = 52 cells. **14 / 52 cells are vulnerable**, all
+in the two Postfix-sender columns:
 
-| Payload | Family        | Bytes       | Classification |
-|---------|---------------|-------------|----------------|
-| A1      | bare-LF       | `\n.\n`     | vulnerable     |
-| A5      | CRLF-dot-LF   | `\r\n.\n`   | vulnerable     |
+| Payload | P → P | P → E | E → P | E → E |
+|---------|:-----:|:-----:|:-----:|:-----:|
+| A1 `\n.\n`              | ✗ | ✗ | ✓ | ✓ |
+| A2 `\n.\r\n`            | ✗ | ✗ | ✓ | ✓ |
+| A3 `\r.\r`              | ✓ | ✓ | ✓ | ✓ |
+| A4 `\r.\r\n`            | ✓ | ✓ | ✓ | ✓ |
+| A5 `\r\n.\n`            | ✗ | ✗ | ✓ | ✓ |
+| A6 `\r\n.\r`            | ✓ | ✓ | ✓ | ✓ |
+| A7 `\x00\r\n.\r\n`      | ✗ | ✗ | ✓ | ✓ |
+| A8 `\r\n\x00.\r\n`      | ✓ | ✓ | ✓ | ✓ |
+| A9 `\r\x00\n.\r\n`      | ✗ | ✗ | ✓ | ✓ |
+| A10 `\x00\r\n.\r\n`     | ✗ | ✗ | ✓ | ✓ |
+| A11 `\r\n.\x00\r\n`     | ✓ | ✓ | ✓ | ✓ |
+| A12 `\r\n.\r\x00\n`     | ✓ | ✓ | ✓ | ✓ |
+| A13 `\r\n.\r\n\x00`     | ✗ | ✗ | ✓ | ✓ |
 
-For both cases, one harness send produces two emails delivered to
-`bob@labnet.test` — the intended carrier plus the smuggled
-`attacker@evil.test` message — and Zeek raises a
-`Parser_Differential_Pattern` notice on the captured pcap.
+Two key observations:
+1. The receiver MTA does **not** change the outcome — Postfix 3.7's bare-LF
+   tolerance on the *sender* side determines smuggling success.
+2. Exim 4.96 sender is structurally immune because its `remote_smtp` transport
+   negotiates `CHUNKING` and frames the body with `BDAT 935 LAST` instead of
+   dot-terminated `DATA`. Length-prefix framing makes dot-based smuggling
+   syntactically impossible. This is exactly the hardening the paper recommends.
+
+The Zeek inline detector catches all 14 vulnerable cells (100 % recall) with
+2 false positives on A8 (`\x00.\r\n`); see `results/zeek-coverage.json`.
 
 ## Next milestones
 
-- **M1** — Full 13-payload × 4-MTA-pairing matrix (add Exim container,
-  matrix renderer, golden-file regression, sender-side tcpdump capture).
-- **M2** — Mutation fuzzer + patched-version probe (`debian:trixie-slim`
-  with `smtpd_forbid_bare_newline = yes`).
+- **M2** — Live demo via Dovecot IMAP: send one vulnerable cell against the
+  live lab and pull both the carrier and the smuggled message back through
+  an IMAP client.
 - **M3** — Live bypass hunt against bounty-scoped real providers
   (default-off, guarded behind the `external/ENABLED` kill switch).

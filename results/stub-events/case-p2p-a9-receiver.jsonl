@@ -1,0 +1,6 @@
+{"type": "mail_from", "value": "<alice@labnet.test> SIZE=559"}
+{"type": "rcpt_to", "value": "<bob@labnet.test> ORCPT=rfc822;bob@labnet.test"}
+{"type": "data_complete", "mail_from": "<alice@labnet.test> SIZE=559", "rcpt_tos": ["<bob@labnet.test> ORCPT=rfc822;bob@labnet.test"], "body_len": 557}
+{"type": "mail_from", "value": "<attacker@evil.test> SIZE=446"}
+{"type": "rcpt_to", "value": "<bob@labnet.test> ORCPT=rfc822;bob@labnet.test"}
+{"type": "data_complete", "mail_from": "<attacker@evil.test> SIZE=446", "rcpt_tos": ["<bob@labnet.test> ORCPT=rfc822;bob@labnet.test"], "body_len": 444}

@@ -1,0 +1,4 @@
+{"type": "mail_from", "value": "<alice@labnet.test> SIZE=1961"}
+{"type": "rcpt_to", "value": "<bob@labnet.test>"}
+{"type": "mail_from", "value": "<attacker@evil.test>"}
+{"type": "rcpt_to", "value": "<bob@labnet.test>"}

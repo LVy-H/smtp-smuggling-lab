@@ -1,0 +1,39 @@
+2026-04-14 15:14:27 Warning: purging the environment.
+ Suggested action: use keep_environment.
+2026-04-14 15:14:27 Warning: No server certificate defined; will use a selfsigned one.
+ Suggested action: either install a certificate or change tls_advertise_hosts option
+2026-04-14 15:14:27 exim 4.96 daemon started: pid=1, -q30m, listening for SMTP on port 25 (IPv6 and IPv4)
+2026-04-14 15:14:27 Start queue run: pid=12
+2026-04-14 15:14:27 End queue run: pid=12
+2026-04-14 15:14:34 1wCfTG-00000E-1t <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=909 id=76786d74b8fd496a98032c2cc7cd2775@labnet.test
+2026-04-14 15:14:34 1wCfTG-00000E-1t => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 935 byte chunk, total 935\\n250 OK id=1wCfTG-00000E-22"
+2026-04-14 15:14:34 1wCfTG-00000E-1t Completed
+2026-04-14 15:14:39 1wCfTL-00000J-0X <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=529 id=25c8dc7925e84d62a873aad6c68ca23a@labnet.test
+2026-04-14 15:14:39 SMTP protocol synchronization error (next input sent too soon: pipelining was advertised): rejected "This is the trailing content that a non-vulnerable receiver would" H=(harness.labnet.test) [10.89.2.21] next input="consider part of the carrier body. A vulnerable receiver parses it\r\nas the start of a second, smuggled email.\r\nMAIL FROM:<attacker@evil.test>\r\nRCPT TO"
+2026-04-14 15:14:39 1wCfTL-00000J-0X => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 545 byte chunk, total 545\\n250 OK id=1wCfTL-00000N-0e"
+2026-04-14 15:14:39 1wCfTL-00000J-0X Completed
+2026-04-14 15:14:43 1wCfTP-00000O-1a <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=909 id=087d7b4c5a6e487280d23e21235a7cd1@labnet.test
+2026-04-14 15:14:43 1wCfTP-00000O-1a => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 937 byte chunk, total 937\\n250 OK id=1wCfTP-00000W-1j"
+2026-04-14 15:14:43 1wCfTP-00000O-1a Completed
+2026-04-14 15:14:47 1wCfTT-00000T-2u <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=910 id=0cba742005f34f33a2af3002489e140e@labnet.test
+2026-04-14 15:14:47 1wCfTT-00000T-2u => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 938 byte chunk, total 938\\n250 OK id=1wCfTT-00000f-30"
+2026-04-14 15:14:47 1wCfTT-00000T-2u Completed
+2026-04-14 15:14:52 1wCfTY-00000Y-15 <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=528 id=ca09793582cd4177a1a8321c978e2365@labnet.test
+2026-04-14 15:14:52 SMTP protocol synchronization error (next input sent too soon: pipelining was advertised): rejected "consider part of the carrier body. A vulnerable receiver parses it" H=(harness.labnet.test) [10.89.2.21] next input="as the start of a second, smuggled email.\r\nMAIL FROM:<attacker@evil.test>\r\nRCPT TO:<bob@labnet.test>\r\nDATA\r\nFrom: attacker@evil.test\r\nTo: bob@labnet.t"
+2026-04-14 15:14:52 1wCfTY-00000Y-15 => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 544 byte chunk, total 544\\n250 OK id=1wCfTY-00000o-1B"
+2026-04-14 15:14:52 1wCfTY-00000Y-15 Completed
+2026-04-14 15:14:56 1wCfTc-00000d-1t <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=909 id=f1b5e2851ba54259acc43a47efd0513e@labnet.test
+2026-04-14 15:14:56 1wCfTc-00000d-1t => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 936 byte chunk, total 936\\n250 OK id=1wCfTc-00000x-1z"
+2026-04-14 15:14:56 1wCfTc-00000d-1t Completed
+2026-04-14 15:15:01 1wCfTh-00000i-08 <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=909 id=858a8b9a95ee460d94386775a130b48f@labnet.test
+2026-04-14 15:15:01 1wCfTh-00000i-08 => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 937 byte chunk, total 937\\n250 OK id=1wCfTh-000016-0E"
+2026-04-14 15:15:01 1wCfTh-00000i-08 Completed
+2026-04-14 15:15:05 1wCfTl-00000n-1N <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=909 id=352663fb1fe14282b3f21f62ebaae730@labnet.test
+2026-04-14 15:15:05 1wCfTl-00000n-1N => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 937 byte chunk, total 937\\n250 OK id=1wCfTl-00001F-1S"
+2026-04-14 15:15:05 1wCfTl-00000n-1N Completed
+2026-04-14 15:15:10 1wCfTp-00000s-3D <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=908 id=6f10c8e99a4b4671875aaadb979d1edc@labnet.test
+2026-04-14 15:15:10 1wCfTp-00000s-3D => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 935 byte chunk, total 935\\n250 OK id=1wCfTq-00001O-04"
+2026-04-14 15:15:10 1wCfTp-00000s-3D Completed
+2026-04-14 15:15:14 1wCfTu-00000x-1I <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=908 id=df8cc775c01a40c9b8da8a13709ae0ef@labnet.test
+2026-04-14 15:15:14 1wCfTu-00000x-1I => bob@labnet.test R=send_via_smarthost T=remote_smtp H=exim-receiver [10.89.2.11] X=TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256 CV=no K C="250- 936 byte chunk, total 936\\n250 OK id=1wCfTu-00001X-1P"
+2026-04-14 15:15:14 1wCfTu-00000x-1I Completed

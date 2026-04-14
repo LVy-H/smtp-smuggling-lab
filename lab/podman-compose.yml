@@ -25,6 +25,7 @@ services:
       - "seccomp=unconfined"
     environment:
       - POSTFIX_ROLE=sender
+      - TARGET_RECEIVER=${TARGET_RECEIVER:-postfix-receiver}
     extra_hosts:
       - "postfix-receiver:10.89.2.10"
       - "exim-receiver:10.89.2.11"
@@ -44,6 +45,7 @@ services:
       - "seccomp=unconfined"
     environment:
       - EXIM_ROLE=sender
+      - TARGET_RECEIVER=${TARGET_RECEIVER:-postfix-receiver}
     extra_hosts:
       - "postfix-receiver:10.89.2.10"
       - "exim-receiver:10.89.2.11"
