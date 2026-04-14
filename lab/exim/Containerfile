@@ -1,0 +1,23 @@
+FROM debian:12-slim
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        exim4-daemon-light \
+        exim4-base \
+        procps \
+        python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -s /bin/bash bob \
+    && mkdir -p /home/bob/Maildir \
+    && chown -R bob:bob /home/bob
+
+COPY exim4.conf /etc/exim4/exim4.conf
+RUN chown root:Debian-exim /etc/exim4/exim4.conf && chmod 644 /etc/exim4/exim4.conf
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+RUN echo 'dc_use_split_config=false' > /etc/exim4/update-exim4.conf.conf
+
+EXPOSE 25
+CMD ["/entrypoint.sh"]
