@@ -1,0 +1,69 @@
+version: "3.8"
+
+networks:
+  labnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.89.2.0/24
+
+volumes:
+  pcaps:
+  bob-maildir:
+
+services:
+  postfix-sender:
+    image: smtp-lab-postfix:m0
+    container_name: postfix-sender
+    hostname: sender.labnet.test
+    networks:
+      labnet:
+        ipv4_address: 10.89.2.20
+    security_opt:
+      - "seccomp=unconfined"
+    environment:
+      - POSTFIX_ROLE=sender
+    extra_hosts:
+      - "postfix-receiver:10.89.2.10"
+    ports:
+      - "127.0.0.1:2525:25"
+
+  postfix-receiver:
+    image: smtp-lab-postfix:m0
+    container_name: postfix-receiver
+    hostname: receiver.labnet.test
+    networks:
+      labnet:
+        ipv4_address: 10.89.2.10
+    security_opt:
+      - "seccomp=unconfined"
+    environment:
+      - POSTFIX_ROLE=receiver
+    volumes:
+      - bob-maildir:/home/bob/Maildir
+
+  dovecot:
+    image: smtp-lab-dovecot:m0
+    container_name: dovecot
+    hostname: dovecot.labnet.test
+    networks:
+      - labnet
+    security_opt:
+      - "seccomp=unconfined"
+    volumes:
+      - bob-maildir:/home/bob/Maildir
+
+  tcpdump:
+    image: smtp-lab-tcpdump:m0
+    container_name: tcpdump-sidecar
+    network_mode: "service:postfix-receiver"
+    security_opt:
+      - "seccomp=unconfined"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - pcaps:/pcaps
+    environment:
+      - IFACE=eth0
+      - FILTER=port 25

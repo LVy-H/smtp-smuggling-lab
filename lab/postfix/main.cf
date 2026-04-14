@@ -1,0 +1,23 @@
+# Postfix main.cf — SMTP smuggling lab configuration
+# Explicit settings so upstream Debian defaults never mask the lab.
+
+myhostname = postfix.labnet.test
+mydomain = labnet.test
+myorigin = $mydomain
+inet_interfaces = all
+inet_protocols = ipv4
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+
+# --- The load-bearing line for reproduction of the USENIX 25 paper ---
+smtpd_forbid_bare_newline = no
+smtpd_forbid_unauth_pipelining = no
+
+home_mailbox = Maildir/
+mailbox_command =
+
+smtpd_relay_restrictions = permit_mynetworks reject_unauth_destination
+smtpd_recipient_restrictions = permit_mynetworks reject_unauth_destination
+
+mynetworks = 127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+
+maillog_file = /var/log/mail.log

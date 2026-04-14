@@ -1,0 +1,21 @@
+FROM debian:12-slim
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        postfix \
+        postfix-pcre \
+        rsyslog \
+        ca-certificates \
+        procps \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY main.cf /etc/postfix/main.cf
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+RUN useradd -m -s /bin/bash bob \
+    && mkdir -p /home/bob/Maildir \
+    && chown -R bob:bob /home/bob
+
+EXPOSE 25
+CMD ["/entrypoint.sh"]
