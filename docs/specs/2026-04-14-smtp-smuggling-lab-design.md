@@ -15,15 +15,20 @@ Build a containerized lab that reproduces the 13 SMTP smuggling payload variants
 
 ### Non-Goals
 
-- Reproducing the paper's *public-service* measurements against real email providers (qq.com, Sina, Gmail, etc.). This project is a local lab; no traffic leaves `labnet`.
+- **Spoofing domains the researcher does not own.** Every external-target test uses only researcher-owned sending accounts on researcher-owned domains (or free-mail accounts where the researcher controls both sender and recipient mailboxes). No forged `From:` of a third-party identity to a non-consenting recipient, ever.
+- **Delivering smuggled payloads to non-consenting recipients.** All recipient addresses in external tests belong to the researcher. This is the paper's Section 9.1 ethical discipline and is also what keeps the work inside every major bug bounty program's scope.
 - Building a hardened / production-grade detector. The Zeek rule is for coursework and does not need to handle adversarial evasion beyond the paper's and our own fuzzer's variants.
 - DKIM/SPF/DMARC *infrastructure* reproduction. Authentication is out of scope except insofar as A₁ (baseline `\r\n.\r\n`) must successfully deliver a normal email.
+
+### Explicitly In Scope (new)
+
+- **Live probes against real email providers**, bounded by the non-goals above. The paper's public-service measurement study is *reproducible*, and the interesting follow-on questions — "did the patches hold N months later?" and "does the fix rely on an assumption a fuzzer can violate?" — require touching production infrastructure. The project includes a deliberately separate external-probe subsystem for this (architecture in §3.1, milestone in §2.M3, guardrails in §10.2).
 
 ---
 
 ## 2. Tiered Milestones
 
-The project is structured as three nested tiers. Each tier has a **hard exit criterion**: if hit, the project is submittable at that tier's level. A `git tag milestone-M<N>-complete` is created at each exit to make the floor explicit and recoverable.
+The project is structured as four nested tiers (M0 through M3). Each tier has a **hard exit criterion**: if hit, the project is submittable at that tier's level. A `git tag milestone-M<N>-complete` is created at each exit to make the floor explicit and recoverable. M3 is **default-off** via a kill-switch file (see §10.2) so that M0–M2 can always be built, committed, and submitted without any external probes running.
 
 ### M0 — Floor ("something to submit, even in the worst case") — target: end of day 3
 
@@ -61,13 +66,52 @@ The project is structured as three nested tiers. Each tier has a **hard exit cri
 
 **Exit criterion:** At least one of the three yields a written finding in `results/m2-findings.md` (positive or negative).
 
+### M3 — Live Bypass Hunt — target: remaining time after week 3, or post-submission continuation
+
+**Scope:** Probe real, live email providers with the full M1+M2 payload corpus plus assumption-violating encoding mutants, looking for *new* variants not in the paper that still smuggle against providers the paper flagged as patched. This tier is framed as a **fix-study hunt**, not a fuzz-blast: we pick a target, read its published patch notes or infer its fix from observed behaviour, form a hypothesis about the assumption the fix relies on, then generate payloads that violate exactly that assumption.
+
+**Target allowlist** (lives in `external/targets.yaml`, each entry recording program URL, in-scope statement, last-verified-active date, rate limit, contact email):
+
+1. **Fastmail** — H1 program, paper found bare-`\r` variant, historically responsive. Primary target for bypass hunt.
+2. **Yandex** — own program at yandex.com/bugbounty, paper found vulnerable.
+3. **Sina / Sohu** — CNVD / CN-CERT responsible disclosure, paper found both vulnerable; interesting because their fixes (if any) are undocumented.
+4. **Gmail VRP** — Google Bug Hunters, mail-infrastructure scope explicit. Paper flagged as not-vulnerable; hunt target is any bypass of the specific bytes they filter.
+5. **Microsoft MSRC** — Outlook / Office 365, mail scope explicit. Paper flagged as not-vulnerable.
+6. **Tencent SRC** — qq.com / Tencent Mail, paper flagged as not-vulnerable.
+7. **Anything the researcher adds** after verifying (a) an active bounty / disclosure program, (b) mail infrastructure in scope, (c) researcher owns accounts on both send and receive sides.
+
+**Assumption-bypass hypotheses, in order of expected payoff:**
+
+1. **Fix operates on ASCII only.** Violate with UTF-8 overlong encoding of `.` (`\xc0\xae`, `\xe0\x80\xae`, `\xf0\x80\x80\xae`), fullwidth `．` (U+FF0E), or Unicode confusables that parser libraries sometimes treat as `.`.
+2. **Fix scans a bounded prefix of the body.** Violate by padding the carrier body with 128 KB of legitimate MIME, then placing the smuggling payload after the scan window.
+3. **Fix normalizes line endings per SMTP-line.** Violate by placing the smuggle across a TCP segment boundary so the MTA sees `\r\n.\r` in segment 1 and `\n MAIL FROM...` in segment 2.
+4. **Fix checks plain SMTP DATA only.** Violate by delivering via `CHUNKING` / `BDAT` extension, where the parser path may differ from `DATA`.
+5. **Fix operates on 7-bit, strips high bits before inspection.** Violate by delivering via `8BITMIME` with a high-bit-set dot.
+6. **Fix checks raw body only.** Violate by encoding the smuggling bytes as quoted-printable (`=0A=2E=0A`) or base64 in a MIME part that the receiver decodes after the smuggling check.
+7. **Fix assumes CR and LF can be treated symmetrically.** Violate with mixed-ending payloads that weren't in the paper: `\r\r\n.\r\r\n`, `\n\r.\n\r`, etc. — the fuzzer's search space.
+
+**Methodology discipline:** For each hypothesis, the report records *before probing*: the assumption statement, the predicted outcome, the specific payload that tests it, and the expected stub-event count if the hypothesis holds. We record the actual result next to the prediction. This is the "study the fix, attack the assumption" discipline from the research-mindset notes — a negative result is still a publishable finding ("provider X's patch is robust against assumption class Y"), and a positive result with pre-registered hypothesis beats "I found something" with no theory.
+
+**Rate limits and accounting.** `external/probe-log.jsonl` is append-only, timestamps every send, and the harness sleeps to enforce **≥60 seconds between sends per provider** (the paper used 30; we're double-conservative). A daily cap of 50 sends per provider caps total blast radius. The log is committed to git so the probe history is auditable.
+
+**Disclosure plan — written before the first probe, not after.** Located at `external/disclosure-plan.md` and checked by the harness on startup. Standard terms: 90-day embargo from report to public disclosure, initial report via the program's official channel, CVE requested through MITRE or the provider's CNA, coordinated publication with the provider's timeline.
+
+**Exit criterion:** Any of:
+- (a) Full A₁–A₁₃ rerun against the allowlist with results recorded (reproduction of the paper);
+- (b) At least one assumption hypothesis tested against at least one provider with the result written up as a finding;
+- (c) A documented "we tried, the provider rate-limited us, here's what we learned" negative result.
+
+All three are valid M3 exits. The only way to fail M3 is to skip the write-up.
+
 ---
 
 ## 3. Architecture
 
 ### 3.1 Container topology
 
-Seven containers on one isolated Podman bridge `labnet`. Nothing is forwarded to the host except Dovecot IMAP on `127.0.0.1:1143` for the demo only. Every container runs with `--security-opt seccomp=unconfined` (user's local `seccomp.json` is broken and this removes a class of runtime errors upfront).
+Two independent subsystems: an **isolated lab** (M0–M2) on the Podman bridge `labnet` with no egress, and a **separate external probe** (M3) with deliberate egress to an allowlist of real providers. The two share no containers, no networks, and no credentials. Every container runs with `--security-opt seccomp=unconfined` (user's local `seccomp.json` is broken; this removes a class of runtime errors upfront).
+
+**Lab subsystem (M0–M2, no egress):**
 
 ```
  ┌─────────────┐    SMTP     ┌──────────────┐    SMTP     ┌────────────────┐    LMTP    ┌──────────┐
@@ -85,7 +129,26 @@ Seven containers on one isolated Podman bridge `labnet`. Nothing is forwarded to
         └─────────────────────────►│ detector: AF_PACKET  │   │ (contrast: tail  │
                                    │ on labnet bridge)    │   │ mail.log)        │
                                    └──────────────────────┘   └──────────────────┘
+                          ← ─ ─ ─ ─ ─ ─ labnet (no egress) ─ ─ ─ ─ ─ ─ →
 ```
+
+**External-probe subsystem (M3 only, default-off):**
+
+```
+ ┌───────────────┐          SMTP submission / TLS          ┌────────────────────────┐
+ │ external-     │  ─────────────────────────────────────► │ Fastmail / Yandex /    │
+ │ harness       │          (rate-limited, logged)         │ Sina / Sohu / Gmail /  │
+ │ (reuses       │  ◄──────────────────────────────────── │ Outlook / Tencent ...  │
+ │  harness/     │         IMAP verification &             │ (researcher-owned      │
+ │  send.py)     │         mailbox read-back               │  accounts only)        │
+ └───────────────┘                                         └────────────────────────┘
+        │
+        ▼
+ external/probe-log.jsonl    ← append-only audit trail
+ external/ENABLED            ← kill switch: absent = harness refuses to run
+```
+
+The external harness is the **same Python module** as the lab harness (`harness/send.py`) with a different target hostname and a different runtime-guard module (`harness/external_guard.py`) that enforces rate limits, account-ownership verification, and the kill switch before any `socket.sendall`. One codebase, two runtime profiles.
 
 ### 3.2 MTA images and version pinning
 
@@ -129,7 +192,17 @@ Every payload field is stored **base64-encoded**. Git, YAML parsers, text editor
   smuggled_subject: "SMUGGLED-A2"
   # expected_stub_events deliberately omitted: outcome varies per MTA pairing;
   # filled into results/matrix.json by the harness, not asserted.
+
+- id: M3-utf8-overlong-dot
+  bytes_b64: "DQrAriANCg=="           # "\r\n\xc0\xae \r\n" — UTF-8 overlong '.'
+  family: m3-encoding-bypass
+  encoding: utf8-overlong
+  hypothesis: "Fix operates on ASCII-only dot scanning; UTF-8 overlong slips past."
+  paper_ref: null                     # not in paper — M3 discovery candidate
+  scope: external-only                # the lab harness will refuse to test this
 ```
+
+Any payload tagged `scope: external-only` is only runnable by `harness/run_external.py`, not by `harness/run_matrix.py`. Lab matrix tests that category-filter to `scope != external-only` stay clean even when the M3 payload set grows.
 
 ### 4.3 Baseline row discipline
 
@@ -292,11 +365,13 @@ ATM-Paper/
 │   └── payloads.yaml                # A1–A13 + M2 discoveries, base64-encoded
 │
 ├── harness/
-│   ├── send.py                      # raw-socket SMTP client
-│   ├── run_case.py                  # single-case orchestrator
-│   ├── run_matrix.py                # full matrix driver
+│   ├── send.py                      # raw-socket SMTP client (used by both lab & external)
+│   ├── run_case.py                  # single-case orchestrator (lab)
+│   ├── run_matrix.py                # full matrix driver (lab)
 │   ├── oracle.py                    # pcap → stub replay → event count
-│   └── render_matrix.py             # matrix.json → matrix.md + figures
+│   ├── render_matrix.py             # matrix.json → matrix.md + figures
+│   ├── external_guard.py            # M3 kill-switch / allowlist / rate-limit
+│   └── run_external.py              # M3 probe driver (refuses to run if guards fail)
 │
 ├── detect/
 │   ├── gateway/
@@ -304,12 +379,20 @@ ATM-Paper/
 │   └── logs/
 │       └── parse_mail_log.py        # contrast detector
 │
+├── external/                        # M3 external-probe subsystem (default-off)
+│   ├── ENABLED                      # gitignored — its absence disables the harness
+│   ├── targets.yaml                 # provider allowlist (URL, scope, rate limit, date)
+│   ├── accounts.yaml                # researcher credentials (gitignored, perms 600)
+│   ├── disclosure-plan.md           # 90-day embargo + reporting channels, required
+│   └── probe-log.jsonl              # append-only audit trail of every external send
+│
 ├── results/                         # git-committed evidence
-│   ├── matrix.json                  # machine-readable matrix
-│   ├── matrix.md                    # rendered matrix for the report
+│   ├── matrix.json                  # machine-readable lab matrix (M0–M2)
+│   ├── matrix.md                    # rendered lab matrix for the report
 │   ├── pcaps/                       # per-case pcaps
 │   ├── zeek-notices/                # per-case Zeek notice logs
-│   └── m2-findings.md               # beyond-paper findings
+│   ├── m2-findings.md               # beyond-paper lab findings
+│   └── m3-findings.md               # live-provider findings (M3)
 │
 └── tests/
     ├── test_harness.py
@@ -328,10 +411,32 @@ ATM-Paper/
 
 ## 10. Containment and Safety
 
+Containment rules are split into two regimes. The lab regime (§10.1) is strict and applies to M0–M2. The external regime (§10.2) is deliberately different because external probing requires egress; its safety comes from tight account-ownership and rate-limit guardrails, not from network isolation.
+
+### 10.1 Lab regime (M0–M2)
+
 - All traffic stays on the `labnet` Podman bridge. Nothing forwarded to the host except Dovecot IMAP on `127.0.0.1:1143` (demo only).
-- Every outbound hostname in the test fixtures uses the `.test` reserved TLD. The harness refuses to run if any target resolves outside `10.0.0.0/8` / `labnet`.
+- Every outbound hostname in lab test fixtures uses the `.test` reserved TLD. The lab harness refuses to run if any lab target resolves outside `10.0.0.0/8` / `labnet`.
 - `reproduce.sh` must refuse to run if `podman network inspect labnet` shows any publicly-routable IP binding.
 - All containers run with `--security-opt seccomp=unconfined` (user environment requires this; `seccomp.json` is broken locally).
+
+### 10.2 External regime (M3 only)
+
+The external harness runs in its own container with direct egress but is gated by **four independent guards, all of which must pass** before any byte is written to a socket:
+
+1. **Kill switch.** The file `external/ENABLED` must exist. If it doesn't, the harness prints the guard list and exits. The file is gitignored with a single line (`external/ENABLED`) so it never accidentally lands in a commit and never gets pushed to a grader's machine in an "on" state.
+2. **Target allowlist.** The target hostname must appear in `external/targets.yaml` with a non-expired `last-verified-active` date. Any other hostname is refused. Localhost, `.test`, and RFC1918 addresses are also refused by the external harness — it is strictly for external probes.
+3. **Account ownership proof.** Before any send, the harness connects via IMAP to the *sender* account and to the *recipient* account using credentials in `external/accounts.yaml` (file-permissions 600, gitignored), verifies login, and aborts if either fails. This is the "you own both ends" enforcement. No IMAP login = no send.
+4. **Rate limiter.** Minimum 60 seconds between sends per provider, daily cap of 50 sends per provider, both enforced in `harness/external_guard.py` by checking `external/probe-log.jsonl` before each send. Exceeding either cap aborts with a clear error.
+
+Additionally:
+
+- **Every send is logged append-only** to `external/probe-log.jsonl` with timestamp, target, payload id, sender account, recipient account, outcome, and a hash of the exact bytes sent. This log is committed to git so the probe history is auditable and so a grader or bounty triage team can verify exactly what was sent when.
+- **No spoofing.** The harness refuses to send if the `MAIL FROM` envelope address differs from the authenticated IMAP username. The carrier email's `From:` header must equal the envelope sender. This is enforced by `external_guard.py`, not by convention.
+- **Disclosure plan must exist.** `external/disclosure-plan.md` must exist and be non-empty before the harness runs. The file's existence is checked, not its content, but the check forces the researcher to at least commit a plan before the first probe.
+- **Provider kill-switch.** Any single HTTP 4xx, 5xx, 421 SMTP code, or timeout against a given provider auto-disables that provider in `external/probe-log.jsonl` for the remainder of the day. Re-enabling requires an explicit `--reset-provider <name>` flag on the harness.
+
+The result is a subsystem that can reach real providers, that leaves an auditable trail of exactly what it sent, and that **physically cannot run** without the researcher taking four explicit affirmative steps (create ENABLED file, populate targets, populate accounts, write disclosure plan).
 
 ---
 
@@ -339,16 +444,20 @@ ATM-Paper/
 
 ### 11.1 Report (`docs/report/report.md`)
 
-Target ~10 pages, rendered to PDF for submission. Sections:
+Target ~12 pages with the M3 content, rendered to PDF for submission. Sections:
 
 1. Background — SMTP `DATA` phase and the end-of-data marker.
 2. The parser-differential — paper's contribution in our words.
 3. Lab architecture — Section 3 of this spec, condensed.
 4. Results matrix — auto-generated from `results/matrix.json`.
 5. Detection — Zeek rule explained, log-parser contrast quantified.
-6. Beyond the paper — M2 findings (if any).
-7. Limitations and future work.
-8. References.
+6. Beyond the paper (lab) — M2 fuzzer + patched-version findings.
+7. **Live provider findings** — M3 section, present only if M3 has run. Two subsections:
+   - **7.1 Paper reproduction N months later** — did the patches hold against A₁–A₁₃ for the providers the paper flagged vulnerable? Did any provider the paper flagged non-vulnerable show behaviour change?
+   - **7.2 Assumption-bypass probes** — one paragraph per hypothesis: assumption statement, payload family, predicted outcome, actual outcome, status.
+8. **Ethics and methodology** — M3 section. Cites the paper's Section 9.1, documents the four guards (§10.2), links to `external/probe-log.jsonl` and `external/disclosure-plan.md` as evidence.
+9. Limitations and future work.
+10. References.
 
 ### 11.2 Demo (live, ≤10 minutes)
 
@@ -368,6 +477,9 @@ Target ~10 pages, rendered to PDF for submission. Sections:
 - **Host seccomp.json broken.** Mitigated by `--security-opt seccomp=unconfined` on every container.
 - **Podman rootless `NET_RAW` for Zeek.** Zeek needs `NET_ADMIN` and `NET_RAW`; may require `--cap-add` or running the Zeek container in non-rootless mode. If rootless fails, document the rootful fallback in the README rather than burning hours on it.
 - **M2 is inherently open-ended.** Exit criterion is "you tried and wrote up what happened," not "you found a new CVE." No risk of falling short as long as the write-up exists.
+- **M3 grading-policy risk.** Running probes against real third-party services may fall outside what the course explicitly permits even when the providers' bounty programs allow it. Mitigation: M3 is default-off (the `external/ENABLED` kill switch is gitignored and absent by default), so the graded artifact can be M0+M1+M2 only. Running M3 is an explicit additional step the researcher takes after verifying course permission; it lands as a separate tag `milestone-M3-complete` and a separate `results/m3-findings.md` file rather than being merged into the lab matrix.
+- **M3 account-banning risk.** Providers may flag researcher accounts as abusive even for in-scope testing, costing access. Mitigation: conservative rate limit (60s/send, 50/day cap), per-provider auto-disable on first 4xx/5xx/421/timeout, and a pre-probe IMAP verification step that confirms the account is reachable before burning a send attempt.
+- **M3 disclosure-timeline risk.** Finding a real bypass starts a coordinated-disclosure clock; the report cannot publish details before the embargo ends. Mitigation: `external/disclosure-plan.md` is written *before* the first probe and specifies what can vs. cannot appear in the coursework report if a finding is live-embargoed at submission time (redacted payload, named provider, dated findings-not-yet-disclosed section).
 
 ---
 
