@@ -1,24 +1,19 @@
-# SMTP smuggling payloads — M0 subset (A1, A2, A5)
+# SMTP smuggling payloads — M0 subset (paper's A1 and A5)
 # Cross-ref: Wang et al., USENIX Security '25, Table 1
 # Bytes are base64-encoded to prevent line-ending normalization during transit.
+#
+# There is no "baseline terminator" payload in this list. A1 is literally
+# the research variant from Table 1 of the paper, not the RFC terminator.
+# The harness-level "can we deliver a plain email" sanity check is done
+# separately in tests/test_send.py using an empty smuggled_block.
 
 - id: A1
-  bytes_b64: "DQouDQo="              # "\r\n.\r\n" — legitimate DATA terminator
-  family: baseline
-  paper_ref: "Table 1"
-  scope: lab
-  expected_stub_events: 1            # baseline: EXACTLY 1 event, always
-  description: |
-    Legitimate end-of-data sequence. Included as the sanity row. Any deviation
-    from exactly 1 stub event for A1 indicates the harness itself is broken.
-
-- id: A2
   bytes_b64: "Ci4K"                  # "\n.\n"
   family: bare-lf
   paper_ref: "Table 1, §3.1"
   scope: lab
   smuggled_sender: "attacker@evil.test"
-  smuggled_subject: "SMUGGLED-A2"
+  smuggled_subject: "SMUGGLED-A1"
   description: |
     Bare-LF dot bare-LF. Against a receiver that treats bare LF as line-end,
     this terminates the DATA phase early and the bytes after it are parsed

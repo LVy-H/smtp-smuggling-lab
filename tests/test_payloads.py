@@ -3,18 +3,11 @@ normalization bugs before they silently corrupt the whole matrix."""
 from harness.payloads import Payload, load_payloads
 
 
-def test_a1_decodes_to_exact_crlf_dot_crlf():
+def test_a1_decodes_to_exact_lf_dot_lf():
     payloads = {p.id: p for p in load_payloads("payloads/payloads.yaml")}
-    assert payloads["A1"].raw_bytes == b"\r\n.\r\n"
-    assert payloads["A1"].family == "baseline"
-    assert payloads["A1"].expected_stub_events == 1
-
-
-def test_a2_decodes_to_exact_lf_dot_lf():
-    payloads = {p.id: p for p in load_payloads("payloads/payloads.yaml")}
-    assert payloads["A2"].raw_bytes == b"\n.\n"
-    assert payloads["A2"].family == "bare-lf"
-    assert payloads["A2"].smuggled_sender == "attacker@evil.test"
+    assert payloads["A1"].raw_bytes == b"\n.\n"
+    assert payloads["A1"].family == "bare-lf"
+    assert payloads["A1"].smuggled_sender == "attacker@evil.test"
 
 
 def test_a5_decodes_to_exact_crlf_dot_lf():
@@ -29,6 +22,11 @@ def test_all_payloads_are_scope_lab():
 
 
 def test_payload_raw_bytes_is_bytes_not_str():
-    # Catches accidental .decode() calls
     for p in load_payloads("payloads/payloads.yaml"):
         assert isinstance(p.raw_bytes, bytes), f"{p.id} is {type(p.raw_bytes)}"
+
+
+def test_two_payloads_in_m0_set():
+    payloads = load_payloads("payloads/payloads.yaml")
+    assert len(payloads) == 2
+    assert {p.id for p in payloads} == {"A1", "A5"}

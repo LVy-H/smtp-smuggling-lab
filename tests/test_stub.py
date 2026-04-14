@@ -34,7 +34,7 @@ def _send_raw(port: int, data: bytes) -> bytes:
 @pytest.mark.asyncio
 async def test_baseline_one_email(tmp_path):
     events = tmp_path / "events.jsonl"
-    stub = await _run_stub_on_port(events, 2525)
+    stub = await _run_stub_on_port(events, 3525)
     try:
         # Send one RFC-compliant transaction
         payload = (
@@ -48,7 +48,7 @@ async def test_baseline_one_email(tmp_path):
             b".\r\n"
             b"QUIT\r\n"
         )
-        await asyncio.to_thread(_send_raw, 2525, payload)
+        await asyncio.to_thread(_send_raw, 3525, payload)
         await asyncio.sleep(0.1)
     finally:
         await stub.stop()
@@ -64,7 +64,7 @@ async def test_smuggling_bare_lf_still_one_event_stub_is_rfc_correct(tmp_path):
     # after the bare LF dot gets rejected as a protocol violation or
     # swallowed into the DATA body).
     events = tmp_path / "events.jsonl"
-    stub = await _run_stub_on_port(events, 2526)
+    stub = await _run_stub_on_port(events, 3526)
     try:
         payload = (
             b"EHLO test.example\r\n"
@@ -81,7 +81,7 @@ async def test_smuggling_bare_lf_still_one_event_stub_is_rfc_correct(tmp_path):
             b".\r\n"
             b"QUIT\r\n"
         )
-        await asyncio.to_thread(_send_raw, 2526, payload)
+        await asyncio.to_thread(_send_raw, 3526, payload)
         await asyncio.sleep(0.1)
     finally:
         await stub.stop()
@@ -96,7 +96,7 @@ async def test_smuggling_bare_lf_still_one_event_stub_is_rfc_correct(tmp_path):
 @pytest.mark.asyncio
 async def test_two_legitimate_emails_back_to_back(tmp_path):
     events = tmp_path / "events.jsonl"
-    stub = await _run_stub_on_port(events, 2527)
+    stub = await _run_stub_on_port(events, 3527)
     try:
         payload = (
             b"EHLO test.example\r\n"
@@ -112,7 +112,7 @@ async def test_two_legitimate_emails_back_to_back(tmp_path):
             b".\r\n"
             b"QUIT\r\n"
         )
-        await asyncio.to_thread(_send_raw, 2527, payload)
+        await asyncio.to_thread(_send_raw, 3527, payload)
         await asyncio.sleep(0.1)
     finally:
         await stub.stop()

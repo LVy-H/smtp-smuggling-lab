@@ -3,6 +3,9 @@ version: "3.8"
 networks:
   labnet:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 10.89.2.0/24
 
 volumes:
   pcaps:
@@ -14,11 +17,14 @@ services:
     container_name: postfix-sender
     hostname: sender.labnet.test
     networks:
-      - labnet
+      labnet:
+        ipv4_address: 10.89.2.20
     security_opt:
       - "seccomp=unconfined"
     environment:
       - POSTFIX_ROLE=sender
+    extra_hosts:
+      - "postfix-receiver:10.89.2.10"
     ports:
       - "127.0.0.1:2525:25"
 
@@ -27,7 +33,8 @@ services:
     container_name: postfix-receiver
     hostname: receiver.labnet.test
     networks:
-      - labnet
+      labnet:
+        ipv4_address: 10.89.2.10
     security_opt:
       - "seccomp=unconfined"
     environment:
