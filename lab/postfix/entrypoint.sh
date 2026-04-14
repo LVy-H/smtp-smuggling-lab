@@ -15,7 +15,7 @@ fi
 postfix set-permissions >/dev/null 2>&1 || true
 postfix check
 
-service rsyslog start
+rsyslogd
 
 postfix start-fg &
 POSTFIX_PID=$!
