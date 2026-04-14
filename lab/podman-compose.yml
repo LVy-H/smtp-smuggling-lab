@@ -12,10 +12,12 @@ volumes:
   bob-maildir:
 
 services:
+  # ---- Postfix sender (profiles p2p, p2e) ----
   postfix-sender:
     image: smtp-lab-postfix:m0
     container_name: postfix-sender
     hostname: sender.labnet.test
+    profiles: ["p2p", "p2e"]
     networks:
       labnet:
         ipv4_address: 10.89.2.20
@@ -25,13 +27,35 @@ services:
       - POSTFIX_ROLE=sender
     extra_hosts:
       - "postfix-receiver:10.89.2.10"
+      - "exim-receiver:10.89.2.11"
     ports:
       - "127.0.0.1:2525:25"
 
+  # ---- Exim sender (profiles e2p, e2e) ----
+  exim-sender:
+    image: smtp-lab-exim:m1
+    container_name: exim-sender
+    hostname: exim-sender.labnet.test
+    profiles: ["e2p", "e2e"]
+    networks:
+      labnet:
+        ipv4_address: 10.89.2.21
+    security_opt:
+      - "seccomp=unconfined"
+    environment:
+      - EXIM_ROLE=sender
+    extra_hosts:
+      - "postfix-receiver:10.89.2.10"
+      - "exim-receiver:10.89.2.11"
+    ports:
+      - "127.0.0.1:2525:25"
+
+  # ---- Postfix receiver (profiles p2p, e2p) ----
   postfix-receiver:
     image: smtp-lab-postfix:m0
     container_name: postfix-receiver
     hostname: receiver.labnet.test
+    profiles: ["p2p", "e2p"]
     networks:
       labnet:
         ipv4_address: 10.89.2.10
@@ -42,21 +66,41 @@ services:
     volumes:
       - bob-maildir:/home/bob/Maildir
 
+  # ---- Exim receiver (profiles p2e, e2e) ----
+  exim-receiver:
+    image: smtp-lab-exim:m1
+    container_name: exim-receiver
+    hostname: exim-receiver.labnet.test
+    profiles: ["p2e", "e2e"]
+    networks:
+      labnet:
+        ipv4_address: 10.89.2.11
+    security_opt:
+      - "seccomp=unconfined"
+    environment:
+      - EXIM_ROLE=receiver
+    volumes:
+      - bob-maildir:/home/bob/Maildir
+
+  # ---- Dovecot (every profile) ----
   dovecot:
     image: smtp-lab-dovecot:m0
     container_name: dovecot
     hostname: dovecot.labnet.test
+    profiles: ["p2p", "p2e", "e2p", "e2e"]
     networks:
-      - labnet
+      labnet:
+        ipv4_address: 10.89.2.30
     security_opt:
       - "seccomp=unconfined"
     volumes:
       - bob-maildir:/home/bob/Maildir
 
-  tcpdump:
+  # ---- Sender-side tcpdump sidecars ----
+  tcpdump-sender-postfix:
     image: smtp-lab-tcpdump:m0
-    container_name: tcpdump-sidecar
-    network_mode: "service:postfix-receiver"
+    container_name: tcpdump-sender-postfix
+    profiles: ["p2p", "p2e"]
     security_opt:
       - "seccomp=unconfined"
     cap_add:
@@ -67,3 +111,65 @@ services:
     environment:
       - IFACE=eth0
       - FILTER=port 25
+      - PCAP_DIR=/pcaps/sender
+    network_mode: "container:postfix-sender"
+    depends_on:
+      - postfix-sender
+
+  tcpdump-sender-exim:
+    image: smtp-lab-tcpdump:m0
+    container_name: tcpdump-sender-exim
+    profiles: ["e2p", "e2e"]
+    security_opt:
+      - "seccomp=unconfined"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - pcaps:/pcaps
+    environment:
+      - IFACE=eth0
+      - FILTER=port 25
+      - PCAP_DIR=/pcaps/sender
+    network_mode: "container:exim-sender"
+    depends_on:
+      - exim-sender
+
+  # ---- Receiver-side tcpdump sidecars ----
+  tcpdump-receiver-postfix:
+    image: smtp-lab-tcpdump:m0
+    container_name: tcpdump-receiver-postfix
+    profiles: ["p2p", "e2p"]
+    security_opt:
+      - "seccomp=unconfined"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - pcaps:/pcaps
+    environment:
+      - IFACE=eth0
+      - FILTER=port 25
+      - PCAP_DIR=/pcaps/receiver
+    network_mode: "container:postfix-receiver"
+    depends_on:
+      - postfix-receiver
+
+  tcpdump-receiver-exim:
+    image: smtp-lab-tcpdump:m0
+    container_name: tcpdump-receiver-exim
+    profiles: ["p2e", "e2e"]
+    security_opt:
+      - "seccomp=unconfined"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - pcaps:/pcaps
+    environment:
+      - IFACE=eth0
+      - FILTER=port 25
+      - PCAP_DIR=/pcaps/receiver
+    network_mode: "container:exim-receiver"
+    depends_on:
+      - exim-receiver
