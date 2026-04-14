@@ -1,0 +1,4 @@
+{
+  "note": "Populated on first successful M1 run. Each entry maps 'pair-payload_id' to the observed classification. Run tests/test_matrix.py after a fresh run_matrix.py to update.",
+  "cells": {}
+}
