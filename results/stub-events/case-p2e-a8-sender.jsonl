@@ -1,0 +1,3 @@
+{"type": "mail_from", "value": "<alice@labnet.test> SIZE=951"}
+{"type": "rcpt_to", "value": "<bob@labnet.test>"}
+{"type": "data_complete", "mail_from": "<alice@labnet.test> SIZE=951", "rcpt_tos": ["<bob@labnet.test>"], "body_len": 949}

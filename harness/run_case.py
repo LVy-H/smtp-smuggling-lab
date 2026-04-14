@@ -1,5 +1,12 @@
 """Single-case orchestrator. Runs one payload through the live lab
-and captures all ground-truth channels."""
+and captures ground-truth channels from both sender-side and
+receiver-side tcpdump sidecars.
+
+In M0 the oracle replayed the receiver-side pcap, which showed
+post-relay (already-normalized) bytes. In M1 we replay the
+sender-side pcap (raw harness->sender bytes), which preserves the
+original smuggling attempt and gives a more accurate stub count.
+"""
 from __future__ import annotations
 
 import asyncio
@@ -18,21 +25,40 @@ from lab.stub.stub_smtpd import StubSmtpd
 class CaseResult:
     case_id: str
     payload_id: str
-    pair: str
-    wire_pcap_path: str
-    stub_event_count: int
+    pair: str  # one of: p2p, p2e, e2p, e2e
+    wire_pcap_sender: str
+    wire_pcap_receiver: str
+    stub_event_count_sender: int
+    stub_event_count_receiver: int
     maildir_file_count: int
     classification: str
 
 
+_SENDER_SIDECAR_BY_PAIR = {
+    "p2p": "tcpdump-sender-postfix",
+    "p2e": "tcpdump-sender-postfix",
+    "e2p": "tcpdump-sender-exim",
+    "e2e": "tcpdump-sender-exim",
+}
+_RECEIVER_SIDECAR_BY_PAIR = {
+    "p2p": "tcpdump-receiver-postfix",
+    "p2e": "tcpdump-receiver-exim",
+    "e2p": "tcpdump-receiver-postfix",
+    "e2e": "tcpdump-receiver-exim",
+}
+_RECEIVER_CONTAINER_BY_PAIR = {
+    "p2p": "postfix-receiver",
+    "p2e": "exim-receiver",
+    "e2p": "postfix-receiver",
+    "e2e": "exim-receiver",
+}
+
+
 def _maildir_count(container: str, user: str = "bob") -> int:
-    """Count files in /home/<user>/Maildir/new inside the container."""
     result = subprocess.run(
         ["podman", "exec", container, "sh", "-c",
          f"ls /home/{user}/Maildir/new 2>/dev/null | wc -l"],
-        capture_output=True,
-        text=True,
-        check=False,
+        capture_output=True, text=True, check=False,
     )
     try:
         return int(result.stdout.strip() or "0")
@@ -48,18 +74,22 @@ def _clear_maildir(container: str, user: str = "bob") -> None:
     )
 
 
-def _set_tcpdump_case_marker(case_id: str) -> None:
+def _set_case_marker(sidecar_container: str, subdir: str, case_id: str) -> None:
+    """Tell a tcpdump sidecar to start a new pcap named case-<id>.pcap.
+    `subdir` is 'sender' or 'receiver'."""
     subprocess.run(
-        ["podman", "exec", "tcpdump-sidecar", "sh", "-c",
-         f"echo {case_id} > /pcaps/current-case.txt"],
+        ["podman", "exec", sidecar_container, "sh", "-c",
+         f"mkdir -p /pcaps/{subdir} && echo {case_id} > /pcaps/{subdir}/current-case.txt"],
         check=True,
     )
 
 
-def _copy_pcap_out(case_id: str, dest: Path) -> None:
+def _copy_pcap_out(sidecar_container: str, subdir: str, case_id: str, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
-        ["podman", "cp", f"tcpdump-sidecar:/pcaps/case-{case_id}.pcap", str(dest)],
+        ["podman", "cp",
+         f"{sidecar_container}:/pcaps/{subdir}/case-{case_id}.pcap",
+         str(dest)],
         check=True,
     )
 
@@ -67,64 +97,95 @@ def _copy_pcap_out(case_id: str, dest: Path) -> None:
 async def run_case(
     case_id: str,
     payload: Payload,
+    pair: str,
     sender_host: str = "127.0.0.1",
     sender_port: int = 2525,
     envelope_from: str = "alice@labnet.test",
     envelope_to: str = "bob@labnet.test",
     results_dir: Path = Path("results"),
 ) -> CaseResult:
-    # 1. Clear the receiver's Maildir so counts are case-scoped
-    _clear_maildir("postfix-receiver")
+    assert pair in ("p2p", "p2e", "e2p", "e2e"), f"unknown pair {pair}"
+    sender_sidecar = _SENDER_SIDECAR_BY_PAIR[pair]
+    receiver_sidecar = _RECEIVER_SIDECAR_BY_PAIR[pair]
+    receiver_container = _RECEIVER_CONTAINER_BY_PAIR[pair]
 
-    # 2. Mark the tcpdump case id so the sidecar starts a new pcap
-    _set_tcpdump_case_marker(case_id)
+    _clear_maildir(receiver_container)
+    _set_case_marker(sender_sidecar, "sender", case_id)
+    _set_case_marker(receiver_sidecar, "receiver", case_id)
     time.sleep(0.5)
 
-    # 3. Send the case through the live lab
-    await asyncio.to_thread(
-        send_case,
-        sender_host, sender_port,
-        envelope_from, envelope_to,
-        payload,
-    )
+    try:
+        await asyncio.to_thread(
+            send_case,
+            sender_host, sender_port,
+            envelope_from, envelope_to,
+            payload,
+        )
+    except Exception as e:
+        # Some MTAs reject outright; still capture whatever pcap exists
+        print(f"  send raised: {type(e).__name__}: {e}")
 
-    # 4. Wait for receiver to queue, deliver, and settle
     time.sleep(2.5)
 
-    # 5. Copy pcap to host results dir
-    pcap_dest = results_dir / "pcaps" / f"case-{case_id}.pcap"
-    _copy_pcap_out(case_id, pcap_dest)
-
-    # 6. Replay captured bytes through the stub oracle
-    events_path = results_dir / "stub-events" / f"case-{case_id}.jsonl"
-    events_path.parent.mkdir(parents=True, exist_ok=True)
-    stub = StubSmtpd("127.0.0.1", 3600, events_path)
-    await stub.start()
+    pcap_sender = results_dir / "pcaps" / f"case-{case_id}-sender.pcap"
+    pcap_receiver = results_dir / "pcaps" / f"case-{case_id}-receiver.pcap"
     try:
-        await replay_against_stub(pcap_dest, stub_host="127.0.0.1", stub_port=3600)
+        _copy_pcap_out(sender_sidecar, "sender", case_id, pcap_sender)
+    except subprocess.CalledProcessError:
+        pcap_sender.parent.mkdir(parents=True, exist_ok=True)
+        pcap_sender.write_bytes(b"")
+    try:
+        _copy_pcap_out(receiver_sidecar, "receiver", case_id, pcap_receiver)
+    except subprocess.CalledProcessError:
+        pcap_receiver.parent.mkdir(parents=True, exist_ok=True)
+        pcap_receiver.write_bytes(b"")
+
+    stub_events_dir = results_dir / "stub-events"
+    stub_events_dir.mkdir(parents=True, exist_ok=True)
+
+    sender_events = stub_events_dir / f"case-{case_id}-sender.jsonl"
+    stub_s = StubSmtpd("127.0.0.1", 3600, sender_events)
+    await stub_s.start()
+    try:
+        if pcap_sender.stat().st_size > 0:
+            await replay_against_stub(pcap_sender, "127.0.0.1", 3600)
     finally:
-        await stub.stop()
-    stub_count = count_data_complete_events(events_path)
+        await stub_s.stop()
+    stub_count_sender = count_data_complete_events(sender_events)
 
-    # 7. Count delivered emails in the receiver's Maildir
-    maildir_count = _maildir_count("postfix-receiver")
+    receiver_events = stub_events_dir / f"case-{case_id}-receiver.jsonl"
+    stub_r = StubSmtpd("127.0.0.1", 3601, receiver_events)
+    await stub_r.start()
+    try:
+        if pcap_receiver.stat().st_size > 0:
+            await replay_against_stub(pcap_receiver, "127.0.0.1", 3601)
+    finally:
+        await stub_r.stop()
+    stub_count_receiver = count_data_complete_events(receiver_events)
 
-    # 8. Classify
-    if stub_count > 1 or maildir_count > 1:
+    maildir_count = _maildir_count(receiver_container)
+
+    if stub_count_sender > 1 or maildir_count > 1:
         classification = "vulnerable"
-    elif stub_count == 1 and maildir_count == 1:
+    elif stub_count_sender == 1 and maildir_count == 1:
         classification = "not-vulnerable"
-    elif stub_count == 1 and maildir_count == 0:
+    elif stub_count_sender == 1 and maildir_count == 0:
         classification = "sanitized-or-dropped"
+    elif stub_count_sender == 0 and maildir_count == 0:
+        classification = "rejected-by-receiver"
+    elif stub_count_sender == 0 and maildir_count == 1:
+        classification = "not-vulnerable"
     else:
-        classification = f"unknown-stub={stub_count}-maildir={maildir_count}"
+        classification = f"unknown-sender={stub_count_sender}-maildir={maildir_count}"
 
     return CaseResult(
         case_id=case_id,
         payload_id=payload.id,
-        pair="postfix->postfix",
-        wire_pcap_path=str(pcap_dest),
-        stub_event_count=stub_count,
+        pair=pair,
+        wire_pcap_sender=str(pcap_sender),
+        wire_pcap_receiver=str(pcap_receiver),
+        stub_event_count_sender=stub_count_sender,
+        stub_event_count_receiver=stub_count_receiver,
         maildir_file_count=maildir_count,
         classification=classification,
     )

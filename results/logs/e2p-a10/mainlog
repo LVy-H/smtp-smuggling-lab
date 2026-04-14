@@ -1,0 +1,14 @@
+2026-04-14 15:12:59 Warning: purging the environment.
+ Suggested action: use keep_environment.
+2026-04-14 15:12:59 Warning: No server certificate defined; will use a selfsigned one.
+ Suggested action: either install a certificate or change tls_advertise_hosts option
+2026-04-14 15:12:59 exim 4.96 daemon started: pid=1, -q30m, listening for SMTP on port 25 (IPv6 and IPv4)
+2026-04-14 15:12:59 Start queue run: pid=12
+2026-04-14 15:12:59 End queue run: pid=12
+2026-04-14 15:13:06 1wCfRq-00000E-15 <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=909 id=367674ca0ef24f288e86d864ef4bd243@labnet.test
+2026-04-14 15:13:06 1wCfRq-00000E-15 => bob@labnet.test R=send_via_smarthost T=remote_smtp H=postfix-receiver [10.89.2.10] K C="250 2.0.0 Ok: 935 bytes queued as 5F964842A45"
+2026-04-14 15:13:06 1wCfRq-00000E-15 Completed
+2026-04-14 15:13:10 1wCfRu-00000J-2m <= alice@labnet.test H=(harness.labnet.test) [10.89.2.21] P=esmtp S=529 id=1ecf17356e8a4d2f922ea2c34928cb90@labnet.test
+2026-04-14 15:13:10 SMTP protocol synchronization error (next input sent too soon: pipelining was advertised): rejected "This is the trailing content that a non-vulnerable receiver would" H=(harness.labnet.test) [10.89.2.21] next input="consider part of the carrier body. A vulnerable receiver parses it\r\nas the start of a second, smuggled email.\r\nMAIL FROM:<attacker@evil.test>\r\nRCPT TO"
+2026-04-14 15:13:10 1wCfRu-00000J-2m => bob@labnet.test R=send_via_smarthost T=remote_smtp H=postfix-receiver [10.89.2.10] K C="250 2.0.0 Ok: 545 bytes queued as D6C05842A47"
+2026-04-14 15:13:10 1wCfRu-00000J-2m Completed

@@ -1,0 +1,368 @@
+{
+  "summary": {
+    "total_cells": 52,
+    "vulnerable_cells_missed": [],
+    "clean_cells_fired_on": [
+      "p2p-a8",
+      "p2e-a8"
+    ]
+  },
+  "per_case": {
+    "p2p-a1": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2p-a10": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2p-a11": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2p-a12": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2p-a13": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2p-a2": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2p-a3": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2p-a4": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2p-a5": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2p-a6": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2p-a7": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2p-a8": {
+      "classification": "not-vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2p-a9": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2e-a1": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2e-a10": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2e-a11": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2e-a12": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2e-a13": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2e-a2": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2e-a3": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2e-a4": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2e-a5": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2e-a6": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "p2e-a7": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2e-a8": {
+      "classification": "not-vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "p2e-a9": {
+      "classification": "vulnerable",
+      "notice_count": 1,
+      "notices": [
+        {
+          "note": "SMTPSmuggling::Parser_Differential_Pattern",
+          "msg": "tx-rate: 10.89.2.20 emitted multiple DATA transactions within 2s (count=2)",
+          "src": "10.89.2.20"
+        }
+      ]
+    },
+    "e2p-a1": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a10": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a11": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a12": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a13": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a2": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a3": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a4": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a5": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a6": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a7": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a8": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2p-a9": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a1": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a10": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a11": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a12": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a13": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a2": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a3": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a4": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a5": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a6": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a7": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a8": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    },
+    "e2e-a9": {
+      "classification": "not-vulnerable",
+      "notice_count": 0,
+      "notices": []
+    }
+  }
+}

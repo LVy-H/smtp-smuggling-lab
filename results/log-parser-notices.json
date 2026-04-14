@@ -1,0 +1,690 @@
+{
+  "p2p-a1": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2"
+      ],
+      "count": 2
+    }
+  ],
+  "p2p-a10": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6"
+      ],
+      "count": 4
+    }
+  ],
+  "p2p-a11": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2"
+      ],
+      "count": 5
+    }
+  ],
+  "p2p-a12": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2"
+      ],
+      "count": 6
+    }
+  ],
+  "p2p-a13": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2",
+        "66FD2842AB2",
+        "67C18842AB6"
+      ],
+      "count": 8
+    }
+  ],
+  "p2p-a2": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2",
+        "66FD2842AB2",
+        "67C18842AB6",
+        "8B1F7842AB2",
+        "8BCA1842AB6"
+      ],
+      "count": 10
+    }
+  ],
+  "p2p-a3": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2",
+        "66FD2842AB2",
+        "67C18842AB6",
+        "8B1F7842AB2",
+        "8BCA1842AB6",
+        "AD041842AB2"
+      ],
+      "count": 11
+    }
+  ],
+  "p2p-a4": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2",
+        "66FD2842AB2",
+        "67C18842AB6",
+        "8B1F7842AB2",
+        "8BCA1842AB6",
+        "AD041842AB2",
+        "003C4842AB2"
+      ],
+      "count": 12
+    }
+  ],
+  "p2p-a5": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2",
+        "66FD2842AB2",
+        "67C18842AB6",
+        "8B1F7842AB2",
+        "8BCA1842AB6",
+        "AD041842AB2",
+        "003C4842AB2",
+        "4571F842AB2",
+        "46C9E842AB6"
+      ],
+      "count": 14
+    }
+  ],
+  "p2p-a6": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2",
+        "66FD2842AB2",
+        "67C18842AB6",
+        "8B1F7842AB2",
+        "8BCA1842AB6",
+        "AD041842AB2",
+        "003C4842AB2",
+        "4571F842AB2",
+        "46C9E842AB6",
+        "7A891842AB2"
+      ],
+      "count": 15
+    }
+  ],
+  "p2p-a7": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2",
+        "66FD2842AB2",
+        "67C18842AB6",
+        "8B1F7842AB2",
+        "8BCA1842AB6",
+        "AD041842AB2",
+        "003C4842AB2",
+        "4571F842AB2",
+        "46C9E842AB6",
+        "7A891842AB2",
+        "ABA47842AB2",
+        "AC703842AB6"
+      ],
+      "count": 17
+    }
+  ],
+  "p2p-a8": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2",
+        "66FD2842AB2",
+        "67C18842AB6",
+        "8B1F7842AB2",
+        "8BCA1842AB6",
+        "AD041842AB2",
+        "003C4842AB2",
+        "4571F842AB2",
+        "46C9E842AB6",
+        "7A891842AB2",
+        "ABA47842AB2",
+        "AC703842AB6",
+        "DC915842AB2"
+      ],
+      "count": 18
+    }
+  ],
+  "p2p-a9": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "97B6F842AB1",
+        "98900842AB2",
+        "BC677842AB2",
+        "BD0BF842AB6",
+        "F0198842AB2",
+        "34480842AB2",
+        "66FD2842AB2",
+        "67C18842AB6",
+        "8B1F7842AB2",
+        "8BCA1842AB6",
+        "AD041842AB2",
+        "003C4842AB2",
+        "4571F842AB2",
+        "46C9E842AB6",
+        "7A891842AB2",
+        "ABA47842AB2",
+        "AC703842AB6",
+        "DC915842AB2",
+        "10C21842AB2",
+        "115DD842AB6"
+      ],
+      "count": 20
+    }
+  ],
+  "p2e-a1": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38"
+      ],
+      "count": 2
+    }
+  ],
+  "p2e-a10": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38"
+      ],
+      "count": 4
+    }
+  ],
+  "p2e-a11": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37"
+      ],
+      "count": 5
+    }
+  ],
+  "p2e-a12": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37"
+      ],
+      "count": 6
+    }
+  ],
+  "p2e-a13": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37",
+        "68062842A37",
+        "68590842A38"
+      ],
+      "count": 8
+    }
+  ],
+  "p2e-a2": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37",
+        "68062842A37",
+        "68590842A38",
+        "AFC1A842A37",
+        "B0929842A38"
+      ],
+      "count": 10
+    }
+  ],
+  "p2e-a3": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37",
+        "68062842A37",
+        "68590842A38",
+        "AFC1A842A37",
+        "B0929842A38",
+        "E31FF842A37"
+      ],
+      "count": 11
+    }
+  ],
+  "p2e-a4": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37",
+        "68062842A37",
+        "68590842A38",
+        "AFC1A842A37",
+        "B0929842A38",
+        "E31FF842A37",
+        "203FD842A37"
+      ],
+      "count": 12
+    }
+  ],
+  "p2e-a5": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37",
+        "68062842A37",
+        "68590842A38",
+        "AFC1A842A37",
+        "B0929842A38",
+        "E31FF842A37",
+        "203FD842A37",
+        "52DC8842A37",
+        "53965842A38"
+      ],
+      "count": 14
+    }
+  ],
+  "p2e-a6": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37",
+        "68062842A37",
+        "68590842A38",
+        "AFC1A842A37",
+        "B0929842A38",
+        "E31FF842A37",
+        "203FD842A37",
+        "52DC8842A37",
+        "53965842A38",
+        "8E62D842A37"
+      ],
+      "count": 15
+    }
+  ],
+  "p2e-a7": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37",
+        "68062842A37",
+        "68590842A38",
+        "AFC1A842A37",
+        "B0929842A38",
+        "E31FF842A37",
+        "203FD842A37",
+        "52DC8842A37",
+        "53965842A38",
+        "8E62D842A37",
+        "C6B00842A37",
+        "C70D4842A38"
+      ],
+      "count": 17
+    }
+  ],
+  "p2e-a8": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37",
+        "68062842A37",
+        "68590842A38",
+        "AFC1A842A37",
+        "B0929842A38",
+        "E31FF842A37",
+        "203FD842A37",
+        "52DC8842A37",
+        "53965842A38",
+        "8E62D842A37",
+        "C6B00842A37",
+        "C70D4842A38",
+        "E1999842A37"
+      ],
+      "count": 18
+    }
+  ],
+  "p2e-a9": [
+    {
+      "type": "multi-queue-per-client",
+      "client_ip": "10.89.2.20",
+      "queue_ids": [
+        "A2900842A37",
+        "A39B1842A38",
+        "D4E2C842A37",
+        "D599E842A38",
+        "1F308842A37",
+        "3D59D842A37",
+        "68062842A37",
+        "68590842A38",
+        "AFC1A842A37",
+        "B0929842A38",
+        "E31FF842A37",
+        "203FD842A37",
+        "52DC8842A37",
+        "53965842A38",
+        "8E62D842A37",
+        "C6B00842A37",
+        "C70D4842A38",
+        "E1999842A37",
+        "28F8B842A37",
+        "29BD1842A38"
+      ],
+      "count": 20
+    }
+  ],
+  "e2p-a1": [],
+  "e2p-a10": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 2
+    }
+  ],
+  "e2p-a11": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 3
+    }
+  ],
+  "e2p-a12": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 4
+    }
+  ],
+  "e2p-a13": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 5
+    }
+  ],
+  "e2p-a2": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 6
+    }
+  ],
+  "e2p-a3": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 7
+    }
+  ],
+  "e2p-a4": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 8
+    }
+  ],
+  "e2p-a5": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 9
+    }
+  ],
+  "e2p-a6": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 10
+    }
+  ],
+  "e2p-a7": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 11
+    }
+  ],
+  "e2p-a8": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 12
+    }
+  ],
+  "e2p-a9": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 13
+    }
+  ],
+  "e2e-a1": [],
+  "e2e-a10": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 2
+    }
+  ],
+  "e2e-a11": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 3
+    }
+  ],
+  "e2e-a12": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 4
+    }
+  ],
+  "e2e-a13": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 5
+    }
+  ],
+  "e2e-a2": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 6
+    }
+  ],
+  "e2e-a3": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 7
+    }
+  ],
+  "e2e-a4": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 8
+    }
+  ],
+  "e2e-a5": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 9
+    }
+  ],
+  "e2e-a6": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 10
+    }
+  ],
+  "e2e-a7": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 11
+    }
+  ],
+  "e2e-a8": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 12
+    }
+  ],
+  "e2e-a9": [
+    {
+      "type": "exim-multi-receive",
+      "client_ip": "10.89.2.21",
+      "count": 13
+    }
+  ]
+}

